@@ -3,14 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform } from 'motion/react';
-import { ArrowRight, Droplet, ThermometerSnowflake, Lock } from 'lucide-react';
+import React, { useRef } from 'react';
+import { motion } from 'motion/react';
+import { Droplet, ThermometerSnowflake, Lock } from 'lucide-react';
+import HeroCanvas from './HeroCanvas';
+import Particles from './Particles';
+import GlowButton from './GlowButton';
 
 export default function App() {
-  const { scrollYProgress } = useScroll();
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 1.05]);
+  const heroSectionRef = useRef<HTMLElement>(null);
 
   const scrollToForm = () => {
     document.getElementById('allocation-form')?.scrollIntoView({ behavior: 'smooth' });
@@ -18,12 +19,13 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-bg-dark text-text-light selection:bg-text-light selection:text-bg-dark">
+
       {/* Navigation */}
       <nav className="fixed top-0 left-0 w-full z-50 flex justify-between items-center p-6 md:p-8 mix-blend-difference">
         <div className="font-display font-bold tracking-[0.2em] text-sm uppercase">
           Batch Zero
         </div>
-        <button 
+        <button
           onClick={scrollToForm}
           className="text-xs font-medium tracking-widest uppercase hover:text-accent-bronze transition-colors duration-300"
         >
@@ -31,23 +33,16 @@ export default function App() {
         </button>
       </nav>
 
-      {/* 1. HERO SECTION */}
-      <section className="relative h-screen w-full flex flex-col justify-center items-center overflow-hidden">
-        <motion.div 
-          style={{ opacity: heroOpacity, scale: heroScale }}
-          className="absolute inset-0 z-0"
-        >
-          <div className="absolute inset-0 bg-black/60 z-10" />
-          <img 
-            src="https://images.unsplash.com/photo-1559598467-f8b76c8155d0?q=80&w=2071&auto=format&fit=crop" 
-            alt="Dark textured ice cream" 
-            className="w-full h-full object-cover grayscale opacity-80"
-            referrerPolicy="no-referrer"
-          />
-        </motion.div>
+      {/* ─── 1. HERO SECTION ──────────────────────────────────────────────────── */}
+      <section ref={heroSectionRef} className="relative h-screen w-full flex flex-col justify-center items-center overflow-hidden">
+        {/* Canvas image sequence na pozadí */}
+        <HeroCanvas triggerRef={heroSectionRef} />
 
-        <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-5xl mx-auto mt-20">
-          <motion.h1 
+        {/* Tmavý overlay přes canvas */}
+        <div className="absolute inset-0 bg-black/50 z-10 pointer-events-none" />
+
+        <div className="relative z-20 flex flex-col items-center text-center px-4 max-w-5xl mx-auto mt-20">
+          <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
@@ -55,8 +50,8 @@ export default function App() {
           >
             DOKONALOST NELZE<br />VYRÁBĚT PO TUNÁCH.
           </motion.h1>
-          
-          <motion.p 
+
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
@@ -138,19 +133,30 @@ export default function App() {
           </motion.div>
         </div>
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5, duration: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-20"
         >
           <span className="text-[10px] uppercase tracking-widest text-accent-silver">Scroll</span>
           <div className="w-[1px] h-12 bg-gradient-to-b from-accent-silver to-transparent" />
         </motion.div>
       </section>
 
-      {/* 2. MANIFESTO */}
-      <section className="relative w-full border-t border-border-subtle">
+      {/* ─── 2. MANIFESTO ─────────────────────────────────────────────────────── */}
+      <section className="relative w-full border-t border-border-subtle overflow-hidden">
+        {/* Ambient blob — vlevo nahoře */}
+        <div
+          className="ambient-blob w-[600px] h-[300px] top-0 left-[-150px]"
+          style={{
+            background: 'radial-gradient(circle, rgba(163,138,89,1) 0%, transparent 70%)',
+            '--blob-dur': '20s',
+            '--blob-del': '2s',
+            '--blob-op': '0.06',
+          } as React.CSSProperties}
+        />
+
         <div className="grid grid-cols-1 md:grid-cols-2 min-h-[80vh]">
           <div className="p-8 md:p-16 lg:p-24 flex flex-col justify-center border-b md:border-b-0 md:border-r border-border-subtle">
             <motion.div
@@ -167,7 +173,7 @@ export default function App() {
               </p>
             </motion.div>
           </div>
-          
+
           <div className="p-8 md:p-16 lg:p-24 flex flex-col justify-center bg-[#080808]">
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -181,9 +187,9 @@ export default function App() {
                 <div className="font-display text-4xl md:text-5xl font-bold tracking-tighter">BATCH NO. 004</div>
                 <div className="text-sm tracking-widest uppercase mt-2 text-accent-silver">Ve zrání</div>
               </div>
-              
+
               <div className="w-full h-[1px] bg-border-subtle" />
-              
+
               <div>
                 <div className="text-[10px] uppercase tracking-widest text-accent-bronze mb-2">Dostupnost</div>
                 <div className="font-display text-6xl md:text-7xl font-bold tracking-tighter">0 %</div>
@@ -194,10 +200,17 @@ export default function App() {
         </div>
       </section>
 
-      {/* 3. ANATOMIE DOKONALOSTI */}
-      <section className="py-24 md:py-32 border-t border-border-subtle overflow-hidden">
-        <div className="px-6 md:px-12 mb-16 md:mb-24">
-          <motion.h2 
+      {/* ─── 3. ANATOMIE DOKONALOSTI ──────────────────────────────────────────── */}
+      <section className="py-24 md:py-32 border-t border-border-subtle overflow-hidden relative">
+        {/* Diagonální sluneční paprsek z levého horního rohu */}
+        <div className="sun-ray-wrapper">
+          <div className="sun-ray-glow" />
+          <div className="sun-ray-beam" />
+          <div className="sun-ray-core" />
+        </div>
+
+        <div className="px-6 md:px-12 mb-16 md:mb-24 text-center">
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -208,15 +221,15 @@ export default function App() {
           </motion.h2>
         </div>
 
-        <div className="flex overflow-x-auto hide-scrollbar px-6 md:px-12 pb-12 snap-x snap-mandatory">
-          <div className="flex gap-6 md:gap-8 w-max">
+        <div className="flex overflow-x-auto hide-scrollbar md:overflow-visible md:justify-center px-6 md:px-12 pb-12 snap-x snap-mandatory md:snap-none">
+          <div className="flex gap-6 md:gap-8 w-max md:w-auto">
             {/* Pillar 1 */}
-            <motion.div 
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.8 }}
-              className="w-[85vw] md:w-[400px] shrink-0 border border-border-subtle p-8 md:p-10 snap-start bg-[#050505] hover:bg-[#0a0a0a] transition-colors duration-500"
+              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              className="pillar-card w-[85vw] md:w-[400px] shrink-0 border border-border-subtle p-8 md:p-10 snap-start bg-[#050505]"
             >
               <Droplet className="w-8 h-8 text-accent-bronze mb-12" strokeWidth={1} />
               <h3 className="font-display text-2xl font-bold mb-4">01 / Suroviny</h3>
@@ -226,12 +239,12 @@ export default function App() {
             </motion.div>
 
             {/* Pillar 2 */}
-            <motion.div 
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.8, delay: 0.1 }}
-              className="w-[85vw] md:w-[400px] shrink-0 border border-border-subtle p-8 md:p-10 snap-start bg-[#050505] hover:bg-[#0a0a0a] transition-colors duration-500"
+              transition={{ duration: 0.9, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+              className="pillar-card w-[85vw] md:w-[400px] shrink-0 border border-border-subtle p-8 md:p-10 snap-start bg-[#050505]"
             >
               <ThermometerSnowflake className="w-8 h-8 text-accent-bronze mb-12" strokeWidth={1} />
               <h3 className="font-display text-2xl font-bold mb-4">02 / Technika</h3>
@@ -241,12 +254,12 @@ export default function App() {
             </motion.div>
 
             {/* Pillar 3 */}
-            <motion.div 
-              initial={{ opacity: 0, x: 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="w-[85vw] md:w-[400px] shrink-0 border border-border-subtle p-8 md:p-10 snap-start bg-[#050505] hover:bg-[#0a0a0a] transition-colors duration-500"
+              transition={{ duration: 0.9, delay: 0.24, ease: [0.16, 1, 0.3, 1] }}
+              className="pillar-card w-[85vw] md:w-[400px] shrink-0 border border-border-subtle p-8 md:p-10 snap-start bg-[#050505]"
             >
               <Lock className="w-8 h-8 text-accent-bronze mb-12" strokeWidth={1} />
               <h3 className="font-display text-2xl font-bold mb-4">03 / Exkluzivita</h3>
@@ -258,12 +271,39 @@ export default function App() {
         </div>
       </section>
 
-      {/* 4. ALOKAČNÍ FORMULÁŘ */}
+      {/* ─── 4. ALOKAČNÍ FORMULÁŘ ─────────────────────────────────────────────── */}
       <section id="allocation-form" className="py-24 md:py-32 border-t border-border-subtle bg-[#030303] relative overflow-hidden">
         {/* Decorative background grid */}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
-             style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '4rem 4rem' }}>
-        </div>
+        <div
+          className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          style={{ backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)', backgroundSize: '4rem 4rem' }}
+        />
+
+        {/* Ambient blob — vlevo dole */}
+        <div
+          className="ambient-blob w-[700px] h-[400px] bottom-[-100px] left-[-200px]"
+          style={{
+            background: 'radial-gradient(circle, rgba(163,138,89,1) 0%, transparent 70%)',
+            '--blob-dur': '19s',
+            '--blob-del': '3s',
+            '--blob-op': '0.07',
+          } as React.CSSProperties}
+        />
+        <div
+          className="ambient-blob w-[500px] h-[300px] top-[-80px] right-[-150px]"
+          style={{
+            background: 'radial-gradient(circle, rgba(192,160,100,1) 0%, transparent 70%)',
+            '--blob-dur': '25s',
+            '--blob-del': '7s',
+            '--blob-op': '0.05',
+          } as React.CSSProperties}
+        />
+
+        {/* Floating particles */}
+        <Particles count={20} zIndex={2} />
+
+        {/* Spotlight beam — vyzařuje ze submit tlačítka */}
+        <div className="spotlight-beam" style={{ bottom: '100px' }} />
 
         <div className="max-w-3xl mx-auto px-6 relative z-10">
           <motion.div
@@ -277,11 +317,11 @@ export default function App() {
               Na nejlepší věci se čeká
             </h2>
             <p className="text-accent-silver font-light leading-relaxed max-w-xl mx-auto">
-              Naše produkce je omezena kapacitou řemeslné výroby. Zapište se na listinu a získejte přístup k privátním várkám, edukačnímu obsahu a komunitě dříve, než se vyprodají.
+              Zapište se na waitlist a získejte přístup k privátním várkám dříve, než se vyprodají. Jakmile budete na řadě - budeme vás kontaktovat.
             </p>
           </motion.div>
 
-          <motion.form 
+          <motion.form
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
@@ -292,8 +332,8 @@ export default function App() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-2">
                 <label className="text-[10px] uppercase tracking-widest text-accent-silver block">Identifikace (Jméno)</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   required
                   className="w-full bg-transparent border-b border-border-subtle py-3 text-text-light focus:outline-none focus:border-text-light transition-colors duration-300 placeholder:text-[#333]"
                   placeholder="Vaše jméno"
@@ -301,8 +341,8 @@ export default function App() {
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] uppercase tracking-widest text-accent-silver block">Komunikační kanál (E-mail)</label>
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   required
                   className="w-full bg-transparent border-b border-border-subtle py-3 text-text-light focus:outline-none focus:border-text-light transition-colors duration-300 placeholder:text-[#333]"
                   placeholder="vas@email.cz"
@@ -312,8 +352,8 @@ export default function App() {
 
             <div className="space-y-2">
               <label className="text-[10px] uppercase tracking-widest text-accent-silver block">Záměr (Povinné)</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 required
                 className="w-full bg-transparent border-b border-border-subtle py-3 text-text-light focus:outline-none focus:border-text-light transition-colors duration-300 placeholder:text-[#333]"
                 placeholder="Proč chcete ochutnat naši zmrzlinu?"
@@ -322,23 +362,15 @@ export default function App() {
 
             <div className="space-y-2">
               <label className="text-[10px] uppercase tracking-widest text-accent-silver block">Profilace (Volitelné)</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 className="w-full bg-transparent border-b border-border-subtle py-3 text-text-light focus:outline-none focus:border-text-light transition-colors duration-300 placeholder:text-[#333]"
                 placeholder="Vaše oblíbená restaurace nebo chuťový profil"
               />
             </div>
 
             <div className="pt-8 flex justify-center">
-              <button
-                type="submit"
-                className="group relative px-12 py-5 border border-border-subtle bg-transparent overflow-hidden transition-all duration-500 hover:border-text-light w-full md:w-auto"
-              >
-                <div className="absolute inset-0 bg-text-light translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[0.16,1,0.3,1]" />
-                <span className="relative z-10 text-xs font-bold tracking-[0.2em] uppercase group-hover:text-bg-dark transition-colors duration-500">
-                  Vystát si frontu
-                </span>
-              </button>
+              <GlowButton type="submit" />
             </div>
           </motion.form>
         </div>
