@@ -9,12 +9,31 @@ import { Droplet, ThermometerSnowflake, Lock } from 'lucide-react';
 import HeroCanvas from './HeroCanvas';
 import Particles from './Particles';
 import GlowButton from './GlowButton';
+import gsap from 'gsap';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+
+gsap.registerPlugin(ScrollToPlugin);
 
 export default function App() {
   const heroSectionRef = useRef<HTMLElement>(null);
 
   const scrollToForm = () => {
-    document.getElementById('allocation-form')?.scrollIntoView({ behavior: 'smooth' });
+    const target = document.querySelector("#allocation-form");
+    if (!target) {
+      console.warn("Target #allocation-form not found!");
+      return;
+    }
+
+    console.log("Scrolling to:", target);
+    
+    // Kill any active scrolls to avoid conflicts
+    gsap.killTweensOf(window);
+    
+    gsap.to(window, {
+      duration: 3,
+      scrollTo: { y: target, autoKill: false },
+      ease: "power3.inOut" // Slightly more premium ease
+    });
   };
 
   return (
@@ -77,8 +96,12 @@ export default function App() {
                 <feDisplacementMap in="SourceGraphic" scale="8"></feDisplacementMap>
               </filter>
             </svg>
-            <div className="button-container" onClick={scrollToForm}>
-              <button type="button" className="button">
+            <div className="button-container">
+              <button 
+                type="button" 
+                className="button"
+                onClick={scrollToForm}
+              >
                 <div className="text-one">
                   <p>
                     <span style={{ "--i": 0 } as React.CSSProperties}>P</span>
